@@ -11,6 +11,7 @@ namespace WebAPI_simple.Repositories
         Task<PublisherNoIdDTO?> UpdatePublisherByIdAsync(int id, PublisherNoIdDTO publisherNoIdDTO);
         Task<bool> HasBooksAsync(int id);
         Task<Publisher?> DeletePublisherByIdAsync(int id);
-        Task<PublisherWithBooksAndAuthorsDTO?> GetBooksByPublisherIdAsync(int id);   
+        Task<PublisherWithBooksAndAuthorsDTO?> GetBooksByPublisherIdAsync(int id);
+        Task<bool> NameExistsAsync(string name, int? excludeId = null);
     }
 }

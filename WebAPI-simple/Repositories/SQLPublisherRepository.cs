@@ -80,5 +80,10 @@ namespace WebAPI_simple.Repositories
                 })
                 .FirstOrDefaultAsync();
         }
+        public async Task<bool> NameExistsAsync(string name, int? excludeId = null)
+        {
+            return await _dbContext.Publishers.AnyAsync(p =>
+                p.Name == name && (excludeId == null || p.Id != excludeId));
+        }
     }
 }

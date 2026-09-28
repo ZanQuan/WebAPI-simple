@@ -36,6 +36,11 @@ namespace WebAPI_simple.Controllers
         [HttpPost("add-publisher")]
         public async Task<IActionResult> AddPublisher([FromBody] AddPublisherRequestDTO addPublisherRequestDTO)
         {
+            addPublisherRequestDTO.Name = addPublisherRequestDTO.Name.Trim();
+            if (await _publisherRepository.NameExistsAsync(addPublisherRequestDTO.Name))
+            {
+                return Conflict(new { message = "Tên NXB đã tồn tại" });
+            }
             var publisherAdd = await _publisherRepository.AddPublisherAsync(addPublisherRequestDTO);
             return Ok(publisherAdd);
         }
@@ -43,6 +48,11 @@ namespace WebAPI_simple.Controllers
         [HttpPut("update-publisher-by-id/{id:int}")]
         public async Task<IActionResult> UpdatePublisherById(int id, [FromBody] PublisherNoIdDTO publisherDTO)
         {
+            publisherDTO.Name = publisherDTO.Name.Trim();
+            if (await _publisherRepository.NameExistsAsync(publisherDTO.Name, id))
+            {
+                return Conflict(new { message = "Tên NXB đã tồn tại" });
+            }
             var publisherUpdate = await _publisherRepository.UpdatePublisherByIdAsync(id, publisherDTO);
             if (publisherUpdate == null)
             {

@@ -75,5 +75,9 @@ namespace WebAPI_simple.Repositories
                 })
                 .FirstOrDefaultAsync();
         }
+        public async Task<bool> HasBooksAsync(int id)
+        {
+            return await _dbContext.Books_Authors.AnyAsync(ba => ba.AuthorId == id);
+        }
     }
 }

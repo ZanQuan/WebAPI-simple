@@ -19,6 +19,10 @@ namespace WebAPI_simple.Data
                 .HasOne(b => b.Author)
                 .WithMany(ba => ba.Book_Authors)
                 .HasForeignKey(bi => bi.AuthorId);
+
+            modelBuilder.Entity<Book_Author>()
+                .HasIndex(ba => new { ba.BookId, ba.AuthorId })
+                .IsUnique();
         }
 
         public DbSet<Book> Books { get; set; }

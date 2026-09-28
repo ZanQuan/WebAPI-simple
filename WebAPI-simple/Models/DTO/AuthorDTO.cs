@@ -1,4 +1,6 @@
-﻿namespace WebAPI_simple.Models.DTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebAPI_simple.Models.DTO
 {
     public class AuthorDTO
     {
@@ -8,6 +10,8 @@
 
     public class AuthorNoIdDTO
     {
+        [Required(ErrorMessage = "FullName không được để trống")]
+        [MinLength(3, ErrorMessage = "FullName tối thiểu 3 ký tự")]
         public string FullName { get; set; }
     }
 

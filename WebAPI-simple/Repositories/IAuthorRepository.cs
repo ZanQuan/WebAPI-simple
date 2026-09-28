@@ -10,6 +10,7 @@ namespace WebAPI_simple.Repositories
         Task<AddAuthorRequestDTO> AddAuthorAsync(AddAuthorRequestDTO addAuthorRequestDTO);
         Task<AuthorNoIdDTO?> UpdateAuthorByIdAsync(int id, AuthorNoIdDTO authorNoIdDTO);
         Task<Author?> DeleteAuthorByIdAsync(int id);
-        Task<AuthorWithBooksDTO?> GetBooksByAuthorIdAsync(int id);   
+        Task<AuthorWithBooksDTO?> GetBooksByAuthorIdAsync(int id);
+        Task<bool> HasBooksAsync(int id);
     }
 }

@@ -54,6 +54,14 @@ namespace WebAPI_simple.Controllers
         [HttpDelete("delete-author-by-id/{id:int}")]
         public async Task<IActionResult> DeleteAuthorById(int id)
         {
+            if (await _authorRepository.HasBooksAsync(id))
+            {
+                return BadRequest(new
+                {
+                    message = "Tác giả vẫn còn sách. Hãy gỡ liên kết trong Book_Author trước khi xóa"
+                });
+            }
+
             var authorDelete = await _authorRepository.DeleteAuthorByIdAsync(id);
             if (authorDelete == null)
             {

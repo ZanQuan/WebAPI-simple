@@ -110,10 +110,13 @@ namespace WebAPI_simple.Repositories
             bookDomain.DateAdded = bookDTO.DateAdded;
             bookDomain.PublisherID = bookDTO.PublisherID;
 
-            _dbContext.Books_Authors.RemoveRange(bookDomain.Book_Authors);
-            await _dbContext.Books_Authors.AddRangeAsync(
-                authorIds.Select(aid => new Book_Author { BookId = id, AuthorId = aid }));
+            var existingIds = bookDomain.Book_Authors.Select(x => x.AuthorId).ToList();
+            var toRemove = bookDomain.Book_Authors.Where(x => !authorIds.Contains(x.AuthorId)).ToList();
+            var toAdd = authorIds.Except(existingIds)
+                .Select(aid => new Book_Author { BookId = id, AuthorId = aid });
 
+            _dbContext.Books_Authors.RemoveRange(toRemove);
+            await _dbContext.Books_Authors.AddRangeAsync(toAdd);
             await _dbContext.SaveChangesAsync();
             return bookDTO;
         }
@@ -129,6 +132,47 @@ namespace WebAPI_simple.Repositories
 
             await _dbContext.SaveChangesAsync();
             return bookDomain;
+        }
+
+        public async Task<bool> PublisherExistsAsync(int publisherId)
+        {
+            return await _dbContext.Publishers.AnyAsync(p => p.Id == publisherId);
+        }
+
+        public async Task<List<int>> GetMissingAuthorIdsAsync(List<int> authorIds)
+        {
+            var existing = await _dbContext.Authors
+                .Where(a => authorIds.Contains(a.Id))
+                .Select(a => a.Id).ToListAsync();
+            return authorIds.Except(existing).ToList();
+        }
+
+        public async Task<bool> TitleExistsInPublisherAsync(string title, int publisherId, int? excludeBookId = null)
+        {
+            return await _dbContext.Books.AnyAsync(b =>
+                b.PublisherID == publisherId && b.Title == title &&
+                (excludeBookId == null || b.Id != excludeBookId));
+        }
+
+        public async Task<List<int>> GetAuthorIdsOverLimitAsync(List<int> authorIds, int maxBooks, int? excludeBookId = null)
+        {
+            return await _dbContext.Books_Authors
+                .Where(ba => authorIds.Contains(ba.AuthorId) &&
+                             (excludeBookId == null || ba.BookId != excludeBookId))
+                .GroupBy(ba => ba.AuthorId)
+                .Where(g => g.Count() >= maxBooks)
+                .Select(g => g.Key)
+                .ToListAsync();
+        }
+
+        public async Task<int> CountBooksByPublisherInYearAsync(int publisherId, int year, int? excludeBookId = null)
+        {
+            var start = new DateTime(year, 1, 1);
+            var end = start.AddYears(1);
+            return await _dbContext.Books.CountAsync(b =>
+                b.PublisherID == publisherId &&
+                b.DateAdded >= start && b.DateAdded < end &&
+                (excludeBookId == null || b.Id != excludeBookId));
         }
     }
 }
