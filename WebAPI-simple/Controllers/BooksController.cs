@@ -9,8 +9,8 @@ namespace WebAPI_simple.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private const int MaxBooksPerAuthor = 20;              // Bài tập 10
-        private const int MaxBooksPerPublisherPerYear = 100;   // Bài tập 11
+        private const int MaxBooksPerAuthor = 20;              
+        private const int MaxBooksPerPublisherPerYear = 100;   
 
         private readonly IBookRepository _bookRepository;
 
@@ -20,9 +20,13 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpGet("get-all-books")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+        [FromQuery] string? filterOn, [FromQuery] string? filterQuery,
+        [FromQuery] string? sortBy, [FromQuery] bool isAscending = true,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 100)
         {
-            var allBooks = await _bookRepository.GetAllBooksAsync();
+            var allBooks = await _bookRepository.GetAllBooksAsync(
+                filterOn, filterQuery, sortBy, isAscending, pageNumber, pageSize);
             return Ok(allBooks);
         }
 
@@ -83,7 +87,6 @@ namespace WebAPI_simple.Controllers
         }
 
         #region Private methods
-        // Trả về true nếu hợp lệ; nếu không thì ghi lỗi vào ModelState
         private async Task<bool> ValidateBookAsync(AddBookRequestDTO dto, int? excludeBookId = null)
         {
             if (dto == null)
@@ -92,13 +95,11 @@ namespace WebAPI_simple.Controllers
                 return false;
             }
 
-            // Kiểm tra Description NotNull
             if (string.IsNullOrWhiteSpace(dto.Description))
             {
                 ModelState.AddModelError(nameof(dto.Description), $"{nameof(dto.Description)} cannot be null");
             }
 
-            // Bài tập 4, 13: NXB phải tồn tại
             if (!await _bookRepository.PublisherExistsAsync(dto.PublisherID))
             {
                 ModelState.AddModelError(nameof(dto.PublisherID),
@@ -106,14 +107,12 @@ namespace WebAPI_simple.Controllers
             }
             else
             {
-                // Bài tập 12: không trùng title trong cùng NXB
                 if (!string.IsNullOrWhiteSpace(dto.Title) &&
                     await _bookRepository.TitleExistsInPublisherAsync(dto.Title.Trim(), dto.PublisherID, excludeBookId))
                 {
                     ModelState.AddModelError(nameof(dto.Title), "NXB này đã có sách trùng tên");
                 }
 
-                // Bài tập 11: giới hạn số sách của NXB trong năm
                 var year = dto.DateAdded.Year;
                 var count = await _bookRepository.CountBooksByPublisherInYearAsync(dto.PublisherID, year, excludeBookId);
                 if (count >= MaxBooksPerPublisherPerYear)
@@ -123,7 +122,6 @@ namespace WebAPI_simple.Controllers
                 }
             }
 
-            // Bài tập 5: tác giả phải tồn tại; Bài tập 10: giới hạn số sách của tác giả
             var authorIds = dto.AuthorIds.Distinct().ToList();
             var missing = await _bookRepository.GetMissingAuthorIdsAsync(authorIds);
             if (missing.Count > 0)

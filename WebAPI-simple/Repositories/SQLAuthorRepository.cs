@@ -14,9 +14,40 @@ namespace WebAPI_simple.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<AuthorDTO>> GetAllAuthorsAsync()
+        public async Task<List<AuthorDTO>> GetAllAuthorsAsync(
+    string? filterOn = null, string? filterQuery = null,
+    string? sortBy = null, bool isAscending = true,
+    int pageNumber = 1, int pageSize = 1000)
         {
-            return await _dbContext.Authors
+            var query = _dbContext.Authors.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filterOn) && !string.IsNullOrWhiteSpace(filterQuery))
+            {
+                var field = filterOn.Trim().ToLowerInvariant();
+                if (field == "fullname" || field == "name")
+                {
+                    query = query.Where(a => a.FullName.Contains(filterQuery));
+                }
+            }
+
+            var sortField = sortBy?.Trim().ToLowerInvariant();
+            if (sortField == "fullname" || sortField == "name")
+            {
+                query = isAscending
+                    ? query.OrderBy(a => a.FullName)
+                    : query.OrderByDescending(a => a.FullName);
+            }
+            else
+            {
+                query = query.OrderBy(a => a.Id);
+            }
+
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Clamp(pageSize, 1, 1000);
+
+            return await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .Select(a => new AuthorDTO { Id = a.Id, FullName = a.FullName })
                 .ToListAsync();
         }

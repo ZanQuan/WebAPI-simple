@@ -18,14 +18,12 @@ namespace WebAPI_simple.Controllers
         [HttpPost]
         public async Task<IActionResult> AddBookAuthor([FromBody] AddBookAuthorRequestDTO dto)
         {
-            // Bài tập 5: kiểm tra tồn tại
             if (!await _repository.BookExistsAsync(dto.BookId))
                 return BadRequest(new { message = $"Sách có Id = {dto.BookId} không tồn tại" });
 
             if (!await _repository.AuthorExistsAsync(dto.AuthorId))
                 return BadRequest(new { message = $"Tác giả có Id = {dto.AuthorId} không tồn tại" });
 
-            // Bài tập 6, 14: trùng quan hệ -> 409
             if (await _repository.RelationExistsAsync(dto.BookId, dto.AuthorId))
                 return Conflict(new { message = "Tác giả đã được gán cho sách này" });
 

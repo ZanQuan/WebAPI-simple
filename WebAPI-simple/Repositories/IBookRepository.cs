@@ -5,7 +5,10 @@ namespace WebAPI_simple.Repositories
 {
     public interface IBookRepository
     {
-        Task<List<BookWithAuthorAndPublisherDTO>> GetAllBooksAsync();
+        Task<List<BookWithAuthorAndPublisherDTO>> GetAllBooksAsync(
+            string? filterOn = null, string? filterQuery = null,
+            string? sortBy = null, bool isAscending = true,
+            int pageNumber = 1, int pageSize = 1000);
         Task<BookWithAuthorAndPublisherDTO?> GetBookByIdAsync(int id);
         Task<AddBookRequestDTO?> AddBookAsync(AddBookRequestDTO addBookRequestDTO);
         Task<AddBookRequestDTO?> UpdateBookByIdAsync(int id, AddBookRequestDTO bookDTO);

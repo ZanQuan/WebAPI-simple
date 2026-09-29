@@ -16,10 +16,14 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpGet("get-all-publisher")]
-        public async Task<IActionResult> GetAllPublisher()
+        public async Task<IActionResult> GetAllPublisher(
+        [FromQuery] string? filterOn, [FromQuery] string? filterQuery,
+        [FromQuery] string? sortBy, [FromQuery] bool isAscending = true,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 100)
         {
-            var allPublishers = await _publisherRepository.GetAllPublishersAsync();
-            return Ok(allPublishers);
+            var result = await _publisherRepository.GetAllPublishersAsync(
+                filterOn, filterQuery, sortBy, isAscending, pageNumber, pageSize);
+            return Ok(result);
         }
 
         [HttpGet("get-publisher-by-id/{id:int}")]

@@ -13,24 +13,58 @@ namespace WebAPI_simple.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<BookWithAuthorAndPublisherDTO>> GetAllBooksAsync()
+        public async Task<List<BookWithAuthorAndPublisherDTO>> GetAllBooksAsync(string? filterOn = null, string? filterQuery = null,string? sortBy = null, bool isAscending = true,int pageNumber = 1, int pageSize = 1000)
         {
-            var allBooks = await _dbContext.Books.Select(book => new BookWithAuthorAndPublisherDTO()
-            {
-                Id = book.Id,
-                Title = book.Title,
-                Description = book.Description,
-                IsRead = book.IsRead,
-                DateRead = book.IsRead ? book.DateRead : null,
-                Rate = book.IsRead ? book.Rate : null,
-                Genre = book.Genre,
-                CoverUrl = book.CoverUrl,
-                DateAdded = book.DateAdded,
-                PublisherName = book.Publisher.Name,
-                AuthorNames = book.Book_Authors.Select(n => n.Author.FullName).ToList()
-            }).ToListAsync();
+            var query = _dbContext.Books.AsQueryable();
 
-            return allBooks;
+            if (!string.IsNullOrWhiteSpace(filterOn) && !string.IsNullOrWhiteSpace(filterQuery))
+            {
+                switch (filterOn.Trim().ToLowerInvariant())
+                {
+                    case "title":
+                        query = query.Where(b => b.Title.Contains(filterQuery)); break;
+                    case "description":
+                        query = query.Where(b => b.Description.Contains(filterQuery)); break;
+                    case "genre":
+                        query = query.Where(b => b.Genre.Contains(filterQuery)); break;
+                    case "rate":
+                        query = int.TryParse(filterQuery, out var rate)
+                            ? query.Where(b => b.IsRead && b.Rate == rate)
+                            : query.Where(b => false);   
+                        break;
+                }
+            }
+
+            query = sortBy?.Trim().ToLowerInvariant() switch
+            {
+                "title" => isAscending ? query.OrderBy(b => b.Title) : query.OrderByDescending(b => b.Title),
+                "genre" => isAscending ? query.OrderBy(b => b.Genre) : query.OrderByDescending(b => b.Genre),
+                "rate" => isAscending ? query.OrderBy(b => b.Rate) : query.OrderByDescending(b => b.Rate),
+                "dateadded" => isAscending ? query.OrderBy(b => b.DateAdded) : query.OrderByDescending(b => b.DateAdded),
+                _ => query.OrderBy(b => b.Id)
+            };
+
+            pageNumber = Math.Max(1, pageNumber);
+            pageSize = Math.Clamp(pageSize, 1, 1000);
+
+            return await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(book => new BookWithAuthorAndPublisherDTO
+                {
+                    Id = book.Id,
+                    Title = book.Title,
+                    Description = book.Description,
+                    IsRead = book.IsRead,
+                    DateRead = book.IsRead ? book.DateRead : null,
+                    Rate = book.IsRead ? book.Rate : null,
+                    Genre = book.Genre,
+                    CoverUrl = book.CoverUrl,
+                    DateAdded = book.DateAdded,
+                    PublisherName = book.Publisher.Name,
+                    AuthorNames = book.Book_Authors.Select(n => n.Author.FullName).ToList()
+                })
+                .ToListAsync();
         }
 
         public async Task<BookWithAuthorAndPublisherDTO?> GetBookByIdAsync(int id)
