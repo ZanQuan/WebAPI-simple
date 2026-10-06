@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI_simple.Models.DTO;
 using WebAPI_simple.Repositories;
 
@@ -16,6 +17,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpGet("get-all-author")]
+        [Authorize(Roles = "Read,Write")]
         public async Task<IActionResult> GetAllAuthor(
         [FromQuery] string? filterOn, [FromQuery] string? filterQuery,
         [FromQuery] string? sortBy, [FromQuery] bool isAscending = true,
@@ -27,6 +29,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpGet("get-author-by-id/{id:int}")]
+        [Authorize(Roles = "Read,Write")]
         public async Task<IActionResult> GetAuthorById(int id)
         {
             var authorWithId = await _authorRepository.GetAuthorByIdAsync(id);
@@ -38,6 +41,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpPost("add-author")]
+        [Authorize(Roles = "Write")]
         public async Task<IActionResult> AddAuthor([FromBody] AddAuthorRequestDTO addAuthorRequestDTO)
         {
             var authorAdd = await _authorRepository.AddAuthorAsync(addAuthorRequestDTO);
@@ -45,6 +49,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpPut("update-author-by-id/{id:int}")]
+        [Authorize(Roles = "Write")]
         public async Task<IActionResult> UpdateAuthorById(int id, [FromBody] AuthorNoIdDTO authorDTO)
         {
             var authorUpdate = await _authorRepository.UpdateAuthorByIdAsync(id, authorDTO);
@@ -56,6 +61,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpDelete("delete-author-by-id/{id:int}")]
+        [Authorize(Roles = "Write")]
         public async Task<IActionResult> DeleteAuthorById(int id)
         {
             if (await _authorRepository.HasBooksAsync(id))
@@ -75,6 +81,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpGet("{id:int}/books")]
+        [Authorize(Roles = "Read,Write")]
         public async Task<IActionResult> GetBooksByAuthorId(int id)
         {
             var result = await _authorRepository.GetBooksByAuthorIdAsync(id);

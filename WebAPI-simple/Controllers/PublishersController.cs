@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI_simple.Models.DTO;
 using WebAPI_simple.Repositories;
 
@@ -16,6 +17,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpGet("get-all-publisher")]
+        [Authorize(Roles = "Read,Write")]
         public async Task<IActionResult> GetAllPublisher(
         [FromQuery] string? filterOn, [FromQuery] string? filterQuery,
         [FromQuery] string? sortBy, [FromQuery] bool isAscending = true,
@@ -27,6 +29,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpGet("get-publisher-by-id/{id:int}")]
+        [Authorize(Roles = "Read,Write")]
         public async Task<IActionResult> GetPublisherById(int id)
         {
             var publisherWithId = await _publisherRepository.GetPublisherByIdAsync(id);
@@ -38,6 +41,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpPost("add-publisher")]
+        [Authorize(Roles = "Write")]
         public async Task<IActionResult> AddPublisher([FromBody] AddPublisherRequestDTO addPublisherRequestDTO)
         {
             addPublisherRequestDTO.Name = addPublisherRequestDTO.Name.Trim();
@@ -50,6 +54,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpPut("update-publisher-by-id/{id:int}")]
+        [Authorize(Roles = "Write")]
         public async Task<IActionResult> UpdatePublisherById(int id, [FromBody] PublisherNoIdDTO publisherDTO)
         {
             publisherDTO.Name = publisherDTO.Name.Trim();
@@ -66,6 +71,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpDelete("delete-publisher-by-id/{id:int}")]
+        [Authorize(Roles = "Write")]
         public async Task<IActionResult> DeletePublisherById(int id)
         {
             if (await _publisherRepository.HasBooksAsync(id))
@@ -82,6 +88,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpGet("{id:int}/books")]
+        [Authorize(Roles = "Read,Write")]
         public async Task<IActionResult> GetBooksByPublisherId(int id)
         {
             var result = await _publisherRepository.GetBooksByPublisherIdAsync(id);

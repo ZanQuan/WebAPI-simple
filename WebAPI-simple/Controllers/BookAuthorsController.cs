@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI_simple.Models.DTO;
 using WebAPI_simple.Repositories;
 
@@ -16,6 +17,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Write")]
         public async Task<IActionResult> AddBookAuthor([FromBody] AddBookAuthorRequestDTO dto)
         {
             if (!await _repository.BookExistsAsync(dto.BookId))

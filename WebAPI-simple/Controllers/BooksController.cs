@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI_simple.CustomActionFilters;
 using WebAPI_simple.Models.DTO;
 using WebAPI_simple.Repositories;
@@ -20,6 +21,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpGet("get-all-books")]
+        [Authorize(Roles = "Read,Write")]
         public async Task<IActionResult> GetAll(
         [FromQuery] string? filterOn, [FromQuery] string? filterQuery,
         [FromQuery] string? sortBy, [FromQuery] bool isAscending = true,
@@ -31,6 +33,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpGet("get-book-by-id/{id:int}")]
+        [Authorize(Roles = "Read,Write")]
         public async Task<IActionResult> GetBookById([FromRoute] int id)
         {
             var bookWithIdDTO = await _bookRepository.GetBookByIdAsync(id);
@@ -42,6 +45,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpPost("add-book")]
+        [Authorize(Roles = "Write")]
         [ValidateModel]
         public async Task<IActionResult> AddBook([FromBody] AddBookRequestDTO addBookRequestDTO)
         {
@@ -59,6 +63,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpPut("update-book-by-id/{id:int}")]
+        [Authorize(Roles = "Write")]
         [ValidateModel]
         public async Task<IActionResult> UpdateBookById(int id, [FromBody] AddBookRequestDTO bookDTO)
         {
@@ -76,6 +81,7 @@ namespace WebAPI_simple.Controllers
         }
 
         [HttpDelete("delete-book-by-id/{id:int}")]
+        [Authorize(Roles = "Write")]
         public async Task<IActionResult> DeleteBookById(int id)
         {
             var deleteBook = await _bookRepository.DeleteBookByIdAsync(id);
