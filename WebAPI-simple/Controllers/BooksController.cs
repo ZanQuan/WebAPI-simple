@@ -14,21 +14,26 @@ namespace WebAPI_simple.Controllers
         private const int MaxBooksPerPublisherPerYear = 100;   
 
         private readonly IBookRepository _bookRepository;
-
-        public BooksController(IBookRepository bookRepository)
+        private readonly ILogger<BooksController> _logger;
+        public BooksController(IBookRepository bookRepository, ILogger<BooksController> logger)
         {
             _bookRepository = bookRepository;
+            _logger = logger;
         }
 
         [HttpGet("get-all-books")]
         [Authorize(Roles = "Read,Write")]
         public async Task<IActionResult> GetAll(
-        [FromQuery] string? filterOn, [FromQuery] string? filterQuery,
-        [FromQuery] string? sortBy, [FromQuery] bool isAscending = true,
-        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 100)
+            [FromQuery] string? filterOn, [FromQuery] string? filterQuery,
+            [FromQuery] string? sortBy, [FromQuery] bool isAscending = true,
+            [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 100)
         {
+            _logger.LogInformation("GetAll Book Action method was invoked");
+
             var allBooks = await _bookRepository.GetAllBooksAsync(
                 filterOn, filterQuery, sortBy, isAscending, pageNumber, pageSize);
+
+            _logger.LogInformation("Finished GetAll Book, tra ve {Count} sach", allBooks.Count);
             return Ok(allBooks);
         }
 

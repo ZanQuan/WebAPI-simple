@@ -7,9 +7,18 @@ using Microsoft.OpenApi.Models;
 using WebAPI_simple.Data;
 using WebAPI_simple.Middlewares;
 using WebAPI_simple.Repositories;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/Book_log.txt", rollingInterval: RollingInterval.Day)  // 1 file/ngày
+    .MinimumLevel.Information()
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
