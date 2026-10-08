@@ -1,0 +1,60 @@
+﻿@model List<library_web.Models.DTO.BookDTO>
+
+<h2>Danh sách sách</h2>
+<a class="btn btn-primary" asp-controller="Books" asp-action="AddBook">Thêm sách mới</a>
+
+<form asp-controller="Books" asp-action="Index" method="get">
+    <label>Tìm kiếm:</label>
+    <select name="filterOn">
+        <option value="title">Tiêu đề</option>
+        <option value="genre">Thể loại</option>
+        <option value="description">Mô tả</option>
+    </select>
+    <input type="text" name="filterQuery" />
+
+    <label>Sắp xếp:</label>
+    <select name="sortBy">
+        <option value="title">Tiêu đề</option>
+        <option value="rate">Đánh giá</option>
+        <option value="dateAdded">Ngày thêm</option>
+    </select>
+    <label>Tăng dần</label><input type="radio" name="isAscending" value="true" checked />
+    <label>Giảm dần</label><input type="radio" name="isAscending" value="false" />
+    <input type="submit" value="Tìm kiếm" />
+</form>
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>Tiêu đề</th>
+        <th>Tác giả</th>
+        <th>NXB</th>
+        <th>Đánh giá</th>
+        <th>Chi tiết</th>
+        <th>Sửa</th>
+        <th>Xóa</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.Title</td>
+            <td>@string.Join(", ", item.AuthorNames)</td>
+            <td>@item.PublisherName</td>
+            <td>
+                @for (var i = 0; i < (item.Rate ?? 0); i++)
+                {
+                    <span>&#9733;</span>
+                }
+            </td>
+            <td><a asp-action="Details" asp-route-id="@item.Id">Chi tiết</a></td>
+            <td><a asp-action="EditBook" asp-route-id="@item.Id">Sửa</a></td>
+            <td>
+                <form asp-action="DeleteBook" asp-route-id="@item.Id" method="post"
+                      onsubmit="return confirm('Xóa sách này?');" style="display:inline">
+                    <button type="submit">Xóa</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>

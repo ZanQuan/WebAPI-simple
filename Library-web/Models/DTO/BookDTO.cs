@@ -1,6 +1,6 @@
-﻿namespace WebAPI_simple.Models.DTO
+﻿namespace library_web.Models.DTO
 {
-    public class BookWithAuthorAndPublisherDTO
+    public class BookDTO
     {
         public int Id { get; set; }
         public string? Title { get; set; }
@@ -11,8 +11,8 @@
         public string? Genre { get; set; }
         public string? CoverUrl { get; set; }
         public DateTime DateAdded { get; set; }
-        public string PublisherName { get; set; }
-        public List<string> AuthorNames { get; set; }
+        public string PublisherName { get; set; } = "";
+        public List<string> AuthorNames { get; set; } = new();
         public int PublisherID { get; set; }
         public List<int> AuthorIds { get; set; } = new();
     }

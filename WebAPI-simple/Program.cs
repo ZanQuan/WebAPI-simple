@@ -118,9 +118,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Cho phép truy cập ảnh đã upload qua URL dạng /Images/ten-file.jpg
+var imagesPath = Path.Combine(builder.Environment.ContentRootPath, "Images");
+Directory.CreateDirectory(imagesPath); // tự tạo thư mục nếu chưa có
+
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Images")),
+    FileProvider = new PhysicalFileProvider(imagesPath),
     RequestPath = "/Images"
 });
 

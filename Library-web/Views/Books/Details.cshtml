@@ -1,0 +1,15 @@
+﻿@model library_web.Models.DTO.BookDTO
+
+<h2>Chi tiết sách</h2>
+@if (!string.IsNullOrEmpty(Model.CoverUrl))
+{
+    <img src="@Model.CoverUrl" style="width:200px" />
+}
+<p>Tên sách: @Model.Title</p>
+<p>Mô tả: @Model.Description</p>
+<p>Thể loại: @Model.Genre</p>
+<p>NXB: @Model.PublisherName</p>
+<p>Tác giả: @string.Join(", ", Model.AuthorNames)</p>
+<p>Đã đọc: @(Model.IsRead ? "Có" : "Chưa")</p>
+<p>Đánh giá: @Model.Rate/5</p>
+<a asp-action="Index">Quay lại</a>

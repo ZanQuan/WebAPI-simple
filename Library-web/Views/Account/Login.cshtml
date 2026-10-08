@@ -1,0 +1,13 @@
+﻿@model library_web.Models.DTO.LoginRequestDTO
+<h2>Đăng nhập</h2>
+@if (ViewBag.Error != null)
+{
+    <p style="color:red">@ViewBag.Error</p>
+}
+<form method="post">
+    <label>Username (email)</label>
+    <input type="text" name="Username" /><br />
+    <label>Password</label>
+    <input type="password" name="Password" /><br />
+    <input type="submit" value="Đăng nhập" />
+</form>

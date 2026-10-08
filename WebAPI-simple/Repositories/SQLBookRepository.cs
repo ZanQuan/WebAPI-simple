@@ -61,6 +61,8 @@ namespace WebAPI_simple.Repositories
                     Genre = book.Genre,
                     CoverUrl = book.CoverUrl,
                     DateAdded = book.DateAdded,
+                    PublisherID = book.PublisherID,
+                    AuthorIds = book.Book_Authors.Select(n => n.AuthorId).ToList(),
                     PublisherName = book.Publisher.Name,
                     AuthorNames = book.Book_Authors.Select(n => n.Author.FullName).ToList()
                 })
@@ -82,6 +84,8 @@ namespace WebAPI_simple.Repositories
                     Genre = book.Genre,
                     CoverUrl = book.CoverUrl,
                     DateAdded = book.DateAdded,
+                    PublisherID = book.PublisherID,
+                    AuthorIds = book.Book_Authors.Select(n => n.AuthorId).ToList(),
                     PublisherName = book.Publisher.Name,
                     AuthorNames = book.Book_Authors.Select(n => n.Author.FullName).ToList()
                 }).FirstOrDefaultAsync();

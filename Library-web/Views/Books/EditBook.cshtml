@@ -1,0 +1,40 @@
+﻿@model library_web.Models.DTO.AddBookDTO
+@{
+    var listAuthor = ViewBag.ListAuthor as List<library_web.Models.DTO.AuthorDTO>;
+    var listPublisher = ViewBag.ListPublisher as List<library_web.Models.DTO.PublisherDTO>;
+    int bookId = ViewBag.BookId;
+}
+<h2>Sửa sách</h2>
+@if (ViewBag.Error != null)
+{
+    <p style="color:red">@ViewBag.Error</p>
+}
+<form asp-controller="Books" asp-action="EditBook" asp-route-id="@bookId" method="post">
+    <label>Title</label>
+    <input type="text" asp-for="Title" /><br />
+    <label>Description</label>
+    <input type="text" asp-for="Description" /><br />
+    <label>Genre</label>
+    <input type="text" asp-for="Genre" /><br />
+    <label>Cover Url</label>
+    <input type="text" asp-for="CoverUrl" /><br />
+    <label>Is Read</label>
+    <input type="checkbox" asp-for="IsRead" /><br />
+    <label>Rate (0-5)</label>
+    <input type="number" asp-for="Rate" min="0" max="5" /><br />
+    <label>NXB</label>
+    <select asp-for="PublisherID">
+        @foreach (var item in listPublisher!)
+        {
+            <option value="@item.Id">@item.Name</option>
+        }
+    </select><br />
+    <label>Tác giả</label>
+    <select asp-for="AuthorIds" multiple>
+        @foreach (var item in listAuthor!)
+        {
+            <option value="@item.Id">@item.FullName</option>
+        }
+    </select><br />
+    <input type="submit" value="Lưu" />
+</form>
